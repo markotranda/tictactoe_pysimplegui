@@ -48,19 +48,38 @@ class AI:
         return move
 
     def minimax(self, state: list) -> int:
-        return self._max(state, None)[1]
+        # !!!!! (score, move) !!!!!
+        return self._max(state, None, float('-inf'), float('inf'))[1]
 
-    def _max(self, state: list, move: int) -> tuple:
+    def _max(self, state: list, move: int, alfa, beta) -> tuple:
         val = self.evaluate(state)
         if val != None:
             return (val, move)
-        scores = [(self._min(self.new_state(state, _move, self.player), _move)[0], _move) for _move in self.get_possible_moves(state)]
-        return max(scores)
+        # scores = [(self._min(self.new_state(state, _move, self.player), _move)[0], _move) for _move in self.get_possible_moves(state)]
+        best_score = (float('-inf'), None)
+        for _move in self.get_possible_moves(state):
+            new_score = (self._min(self.new_state(state, _move, self.player), _move, alfa, beta)[0], _move)
+            if new_score[0] > alfa:
+                alfa = new_score[0]
+            if new_score[0] >= beta:
+                return new_score
+            if new_score > best_score:
+                best_score = new_score
+        return best_score
 
-    def _min(self, state: list, move: int) -> tuple:
+    def _min(self, state: list, move: int, alfa, beta) -> tuple:
         val = self.evaluate(state)
         if val != None:
             return (val, move)
-        scores = [(self._max(self.new_state(state, _move, self.player * -1), _move)[0], _move) for _move in self.get_possible_moves(state)]
-        return min(scores)
+        # scores = [(self._max(self.new_state(state, _move, self.player * -1), _move)[0], _move) for _move in self.get_possible_moves(state)]
+        best_score = (float('inf'), None)
+        for _move in self.get_possible_moves(state):
+            new_score = (self._max(self.new_state(state, _move, self.player), _move, alfa, beta)[0], _move)
+            if new_score[0] < beta:
+                alfa = new_score[0]
+            if new_score[0] <= alfa:
+                return new_score
+            if new_score < best_score:
+                best_score = new_score
+        return best_score
     
